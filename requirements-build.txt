@@ -1,0 +1,2 @@
+# Build tools only; players do not install these.
+pyinstaller==6.16.0

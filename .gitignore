@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+save.json
+save.json.tmp
+artifacts/
+dist/
+*.spec
+save.json.bak
+save.json.unreadable
