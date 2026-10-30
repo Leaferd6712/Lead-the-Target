@@ -285,15 +285,15 @@ class Interface:
     def options(self):
         a=self.app;d=a.display;self.panel(130,120,1180,690);self.text('DISPLAY & ACCESSIBILITY',168,147,32,GOLD)
         w,h=a.win.getXSize(),a.win.getYSize();self.text(f'Detected screen: {d.desktop[0]} x {d.desktop[1]} / Current game: {w} x {h}',168,198,20,AQUA)
-        chosen=dict(a.prefs);self.text('Resolution',170,259,20,WHITE)
-        resolutions=[f'{x} x {y}' for x,y in d.resolutions];current=f'{a.prefs["resolution"][0]} x {a.prefs["resolution"][1]}'
+        chosen=a.display_draft;self.text('Resolution',170,259,20,WHITE)
+        resolutions=[f'{x} x {y}' for x,y in d.resolutions];current=f'{chosen["resolution"][0]} x {chosen["resolution"][1]}'
         self.menu(resolutions,resolutions.index(current),170,310,380,lambda s:chosen.update(resolution=[int(v) for v in s.split(' x ')]))
         self.text('Display mode',610,259,20,WHITE);modes=('Windowed','Borderless','Fullscreen')
-        self.menu(modes,modes.index(a.prefs['display_mode']),610,310,490,lambda s:chosen.update(display_mode=s))
+        self.menu(modes,modes.index(chosen['display_mode']),610,310,490,lambda s:chosen.update(display_mode=s))
         fps=[str(v) if v else 'Uncapped' for v in FPS_OPTIONS];self.text('Frame rate limit',170,365,20,WHITE)
-        self.menu(fps,FPS_OPTIONS.index(a.prefs['fps']),170,415,380,lambda s:chosen.update(fps=0 if s=='Uncapped' else int(s)))
+        self.menu(fps,FPS_OPTIONS.index(chosen['fps']),170,415,380,lambda s:chosen.update(fps=0 if s=='Uncapped' else int(s)))
         self.text('VSync may cap FPS at your monitor refresh rate.',610,373,18,MUTED,490)
-        self.button('VSync: ON' if chosen['vsync'] else 'VSync: OFF',610,413,490,lambda:a.toggle_pref('vsync'),AQUA)
+        self.button('VSync: ON' if chosen['vsync'] else 'VSync: OFF',610,413,490,a.toggle_display_vsync,AQUA)
         for i,(key,title) in enumerate((('compact','Bottom compact controls'),('large_text','Larger text'),('reduced_motion','Reduced motion'),('high_contrast','High contrast'),('muted','Mute sound'))):
             self.button(f'{title}: '+('ON' if a.prefs[key] else 'OFF'),170+(i%2)*480,488+(i//2)*57,450,lambda k=key:a.toggle_pref(k))
         self.text('Physics stays at 120 Hz at every FPS setting. Borderless uses the desktop resolution.',170,686,17,MUTED,1050)

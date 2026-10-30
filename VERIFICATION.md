@@ -27,6 +27,17 @@ installer now exposes the Start menu folder page, permitting an isolated QA grou
 The failed v2.0.0 tag is preserved; the corrected release uses v2.0.1.
 Public release/download results are appended after the corrected run.
 
+The corrected v2.0.1 release workflow completed successfully:
+https://github.com/Leaferd6712/Lead-the-Target/actions/runs/40981088820
+
+A final interaction check reproduced an Options draft bug: choosing a resolution,
+then changing an accessibility preference, discarded the pending display choice.
+The v2.0.2 patch keeps a persistent display draft and applies only display fields,
+preserving immediate accessibility changes. The new DirectGUI callback regression
+passes. The public-download verification helper checks released bytes and runs
+the source in a fresh virtual environment, the portable EXE with a minimal PATH,
+and the installed application with shortcut/uninstall checks.
+
 Limits: no fresh-player study, physical mouse/DPI test across all displays, clean
 Windows VM without developer tools, exhaustive GPU/monitor-mode matrix, macOS or
 Linux package verification, or online leaderboard service. Source and portable

@@ -46,6 +46,18 @@ class InterfaceTests(unittest.TestCase):
         a.display.apply({'resolution':[1920,1080],'fps':144});self.assertEqual(a.prefs['fps'],144)
         a.display.deadline=0;self.assertTrue(a.display.tick());self.assertEqual(a.prefs,old)
 
+    def test_display_choices_survive_accessibility_and_vsync_changes(self):
+        from direct.gui.DirectOptionMenu import DirectOptionMenu
+        a=self.app;a.open_options();a.ui.refresh()
+        menus=[w for w in a.ui.widgets if isinstance(w,DirectOptionMenu)]
+        menus[0].set(menus[0]['items'].index('1600 x 900'))
+        menus[2].set(menus[2]['items'].index('144'))
+        muted=a.prefs['muted'];a.toggle_pref('muted');a.toggle_display_vsync();a.ui.refresh()
+        next(action for button,action,title in a.ui.buttons if title=='APPLY DISPLAY')()
+        self.assertEqual(a.prefs['resolution'],[1600,900]);self.assertEqual(a.prefs['fps'],144)
+        self.assertEqual(a.prefs['muted'],not muted)
+        a.revert_display();a.close_options()
+
     def test_compact_is_bottom_and_can_expand(self):
         a=self.app;a.enter_campaign();a.toggle_compact();a.ui.refresh()
         self.assertTrue(a.scene.compact)

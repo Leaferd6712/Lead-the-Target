@@ -36,6 +36,7 @@ class LeadTheTarget(ShowBase):
         self.speed=1;self.recovery_count=0;self.contract=None
         self.audio=Audio(self)
         self.display=DisplayManager(self,self.prefs,offscreen)
+        self.display_draft=deepcopy(self.prefs)
         if not offscreen:self.display.request()
         self.scene=Battlefield(self);self.scene.compact=self.prefs['compact'];self.scene.resize()
         self.ui=Interface(self)
@@ -86,6 +87,7 @@ class LeadTheTarget(ShowBase):
 
     def open_options(self):
         if self.screen=='options':return
+        self.display_draft=deepcopy(self.prefs)
         self.previous_screen=self.screen;self.navigate('options')
 
     def close_options(self):
@@ -93,7 +95,13 @@ class LeadTheTarget(ShowBase):
         self.screen=self.previous_screen;self.save_profile()
 
     def apply_display(self,chosen):
-        self.display.apply(chosen);self.ui.signature=None
+        # Accessibility changes apply immediately; a stale display draft must
+        # never overwrite them when resolution/FPS are confirmed later.
+        self.display.apply({k:chosen[k] for k in ('resolution','display_mode','fps','vsync')})
+        self.ui.signature=None
+
+    def toggle_display_vsync(self):
+        self.display_draft['vsync']=not self.display_draft['vsync'];self.ui.signature=None
 
     def confirm_display(self):self.display.confirm();self.ui.signature=None;self.save_profile()
 
