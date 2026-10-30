@@ -2,7 +2,7 @@ $ErrorActionPreference = 'Stop'
 $toolsRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\artifacts\tools'))
 New-Item -ItemType Directory -Path $toolsRoot -Force | Out-Null
 $headers = @{ 'User-Agent' = 'LeadTheTarget-build' }
-$release = Invoke-RestMethod 'https://api.github.com/repos/jrsoftware/issrc/releases/latest' -Headers $headers
+$release = Invoke-RestMethod 'https://api.github.com/repos/jrsoftware/issrc/releases/tags/is-7_1_1' -Headers $headers
 $asset = $release.assets | Where-Object { $_.name -match '^innosetup-[0-9.]+-x64.exe$' } | Select-Object -First 1
 if (-not $asset) { throw 'Official Inno Setup x64 compiler release was not found.' }
 $download = Join-Path $toolsRoot $asset.name

@@ -19,9 +19,11 @@ operation or output. It creates a source ZIP, PyInstaller onedir portable ZIP,
 Inno Setup installer and SHA256SUMS.txt under `release/`. It extracts/runs the
 source, launches the bundled EXE with PATH limited to System32, silently installs
 to an isolated QA folder, launches the installed app and uninstalls it.
-Evidence lives in `artifacts/release-qa/`. Test installations retain profile data.
+Evidence lives in `artifacts/release-qa/`. The test also checks bundled fonts/audio
+and Start menu shortcut creation/removal. Test installations retain profile data.
 
-The compiler helper installs per-user build tools; it does not disable UAC or
+The compiler helper pins Inno Setup 7.1.1 (non-commercial compiler licence) and
+installs per-user build tools; it does not disable UAC or
 modify security settings. Distribution installers use `PrivilegesRequired=lowest`.
 Keep the complete portable directory: the EXE deliberately is not a one-file
 self-extracting executable.

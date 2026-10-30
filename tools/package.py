@@ -66,6 +66,9 @@ def main():
          '--workpath',ROOT/'artifacts'/'build','--specpath',ROOT/'artifacts',
          '--distpath',ROOT/'dist',ROOT/'main.py'])
     app=ROOT/'dist'/'LeadTheTarget'
+    for relative in ('fonts/Barlow-Regular.ttf','fonts/Barlow-SemiBold.ttf','fonts/OFL.txt',
+                     'click.wav','hit.wav','shot.wav','win.wav','licenses/PANDA3D-LICENSE.txt'):
+        if not (app/'_internal'/'assets'/relative).is_file():raise RuntimeError(f'Missing bundled asset: {relative}')
     for path in ('README.md','ACCESSIBLE_GUIDE.md','THIRD_PARTY_NOTICES.md','LICENSE','VERSION'):
         shutil.copy2(ROOT/path,app/path)
     smoke(app/'LeadTheTarget.exe',qa/'portable.png')
@@ -75,12 +78,16 @@ def main():
     run([args.iscc,'/Q',f'/DGameVersion={version}',f'/DSourceDir={app}',f'/DReleaseDir={out}',ROOT/'installer'/'game.iss'])
     installer=out/(name+'-windows-setup.exe')
     installed=qa/'installed'
-    run([installer,'/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/NOICONS',f'/DIR={installed}',f'/LOG={qa / "install.log"}'])
+    group=f'LeadTheTarget Release QA {version}'
+    run([installer,'/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART',f'/GROUP={group}',f'/DIR={installed}',f'/LOG={qa / "install.log"}'])
+    shortcut=Path(os.environ['APPDATA'])/'Microsoft'/'Windows'/'Start Menu'/'Programs'/group/'Lead the Target.lnk'
+    if not shortcut.exists():raise RuntimeError('Installer did not create its Start menu shortcut')
     smoke(installed/'LeadTheTarget.exe',qa/'installed.png')
     uninstaller=installed/'unins000.exe'
     if not uninstaller.exists():raise RuntimeError('Installer did not create an uninstaller')
     run([uninstaller,'/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART',f'/LOG={qa / "uninstall.log"}'])
     if (installed/'LeadTheTarget.exe').exists():raise RuntimeError('Uninstaller left the game executable behind')
+    if shortcut.exists():raise RuntimeError('Uninstaller left the Start menu shortcut behind')
     assets=[source,out/(name+'-windows-portable.zip'),installer]
     for p in assets:
         if not p.exists() or not p.stat().st_size:raise RuntimeError(f'Missing distribution: {p}')
