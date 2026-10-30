@@ -1,15 +1,21 @@
-# Third-party components
+# Third-party components and original work
 
-The runtime uses pygame 2.6.1, including its bundled SDL libraries and default
-font. Pygame's installed distribution supplies its own licences and notices.
-Its LGPL text is copied into the packaged release as `PYGAME-LGPL.txt`.
+- **Panda3D 1.10.16:** BSD licence. Source and licence:
+  https://github.com/panda3d/panda3d/blob/master/LICENSE . Panda3D bundles other
+  libraries with their own notices; its distribution's LICENSE is included.
+- **Python 3.12:** Python Software Foundation licence. The standalone build
+  includes Python's licence text. https://www.python.org/psf/license/
+- **PyInstaller 6.16.0:** GPL with the bootloader exception that permits
+  distributing applications under their own licence. Build-tool notices:
+  https://pyinstaller.org/en/stable/license.html . Its COPYING text is bundled.
+- **Barlow Regular and SemiBold**, Jeremy Tribby and contributors: SIL Open
+  Font License 1.1. Fonts are served locally in the game and website, with OFL.txt.
+  https://github.com/google/fonts/tree/main/ofl/barlow
+- **Inno Setup:** installer compiler by Jordan Russell and Martijn Laan;
+  https://jrsoftware.org/ . The compiler is a build tool, not a game dependency.
 
-- Pygame project and source: https://github.com/pygame/pygame
-- Pygame licence information: https://www.pygame.org/LGPL
-- Python runtime source and licence: https://www.python.org/downloads/source/
-- PyInstaller build tool and bootloader notices: https://github.com/pyinstaller/pyinstaller
-
-The screenshot references informed the visual direction. The game draws original
-procedural UI/mesh artwork; no pixels or commercial asset sheets were extracted.
-Audio cues are generated locally. Body text uses an available system font; titles
-use pygame's bundled font. No font is fetched from a remote service.
+Game code retains its MIT licence and copyright in LICENSE. Geometry, class
+markers, UI, website mark and short generated PCM audio cues are original.
+The user's reference images informed the purple, turquoise and gold direction;
+no commercial asset-sheet pixels were copied. Website images are genuine,
+unedited captures produced by tools/qa_screens.py from the Panda3D application.

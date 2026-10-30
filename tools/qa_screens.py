@@ -1,49 +1,34 @@
-"""Reproducible visual QA without changing campaign saves."""
-import os
-from pathlib import Path
+"""Capture genuine Panda3D screens for visual QA and the official website."""
 import sys
+from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-os.environ["SDL_VIDEODRIVER"]="dummy"
-os.environ["SDL_AUDIODRIVER"]="dummy"
-os.environ["PYGAME_HIDE_SUPPORT_PROMPT"]="1"
-import pygame
-from game import Game
-from ui import Interface
-from domain import Scene
+from panda3d.core import Filename
+from app import LeadTheTarget
+from fortress import Emplacement
 
 
 def main():
-    pygame.init()
-    out=Path(__file__).resolve().parents[1]/"artifacts"/"v2"
-    out.mkdir(parents=True,exist_ok=True)
-    game=Game({},persist=False)
-    ui=Interface(game,pygame.display.set_mode((1280,800)))
+    root=Path(__file__).resolve().parents[1]
+    out=root/'website'/'images';out.mkdir(parents=True,exist_ok=True)
+    a=LeadTheTarget(offscreen=True,preview=True,resolution=(1600,1000))
     def capture(name):
-        ui.update(1/60);ui.draw();pygame.image.save(ui.surface,str(out/(name+".png")))
-    capture("title")
-    game.start_campaign();capture("first-task")
-    game.answer("It will hit");capture("incorrect-feedback")
-    game.answer(game.step.correct);capture("congratulations")
-    game.continue_learning();game.run_experiment()
-    for _ in range(105):game.trial.tick()
-    capture("direct-miss")
-    game.trial.finish();game.finish_experiment();game.continue_learning()
-    game.set_algorithm(1);game.set_lead(.8);capture("lead-preview")
-    game.run_experiment();game.trial.finish();game.finish_experiment();capture("measured-success")
-    game.currency=200;game.open_shop();capture("workshop");game.close_panel()
-    game.open_panel(Scene.MAP);capture("skill-map");game.close_panel()
-    game.open_panel(Scene.NOTEBOOK);capture("notebook");game.close_panel()
-    game.open_panel(Scene.OPTIONS);capture("options");game.close_panel()
-    game.stage=5;game.prepare_stage();game.run_experiment()
-    for _ in range(300):game.trial.tick()
-    capture("pid-live")
-    game.enter_sandbox(7);game.set_gains((8,1.5,.4,1));game.begin_wave()
-    for _ in range(120*7):game.tick(game.STEP)
-    capture("defense")
-    game.start_campaign();ui.resize((800,600));game.settings["large_text"]=True
-    capture("compact-large-text")
-    pygame.quit()
-    print("Saved 14 verification screens in",out)
+        a.ui.signature=None;a.ui.refresh();a.sync_scene()
+        for _ in range(3):a.graphicsEngine.renderFrame()
+        path=out/(name+'.png')
+        if not a.win.saveScreenshot(Filename.fromOsSpecific(str(path))):raise RuntimeError(path)
+        print(path)
+    try:
+        c=a.campaign;c.level=34;c.credits=410
+        c.towers=[Emplacement(i+1,pad,'heavy' if i==2 else 'standard',1,4,.8,[8,0,0,0],True)
+                  for i,pad in enumerate((0,1,2,3,8))]
+        a.enter_campaign();c.start()
+        for _ in range(120*8):c.tick()
+        capture('campaign')
+        a.toggle_compact();capture('compact')
+        a.toggle_compact();a.enter_academy(0);capture('academy')
+        a.open_options();capture('options')
+        a.navigate('map');a.map_page=3;capture('campaign-map')
+    finally:a.destroy()
 
 
-if __name__=="__main__":main()
+if __name__=='__main__':main()

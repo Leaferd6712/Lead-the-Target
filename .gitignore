@@ -8,3 +8,9 @@ dist/
 *.spec
 save.json.bak
 save.json.unreadable
+profile3.json*
+release/
+build/
+node_modules/
+test-results/
+playwright-report/

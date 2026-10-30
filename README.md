@@ -1,20 +1,30 @@
-# Lead the Target — Control Quest
+# Lead the Target — Fortress / Control Quest
 
-**Runtime pip dependency: `pygame==2.6.1`. Python 3.11 or 3.12.**
+**Runtime pip dependency: `panda3d==1.10.16`. Python 3.12 is the tested version.**
 
-**Optional build dependency: `pyinstaller==6.16.0` (`requirements-build.txt`).**
+A real 3D tower-defence game built with Panda3D. Tanks keep moving while shells
+travel, so aiming at their current position misses. Build a fortress, choose a
+prediction model and make the shell meet the target in the future.
 
-A colourful geometric 3D tower-defense game that teaches prediction, sensing and
-PIDF control through **37 evidence-checked tasks across eight lessons**. The UI
-uses chunky purple panels, turquoise controls, gold stars and explicit completion
-screens inspired by the supplied arcade UI references.
+Official site: https://leaferd6712.github.io/Lead-the-Target/
 
-## Play
+Downloads: https://github.com/Leaferd6712/Lead-the-Target/releases/latest
 
-Windows packaged build: open `dist/LeadTheTarget/LeadTheTarget.exe`. Keep the whole
-`LeadTheTarget` folder together; Python and pip are not needed for that build.
+## Three ways to play
 
-Source build: double-click `play.bat` after installation, or run:
+- **Python source ZIP:** extract, install Python 3.12, then run the commands below.
+- **Portable Windows ZIP:** extract the complete archive and run
+  `LeadTheTarget/LeadTheTarget.exe`. Keep `_internal` and all supplied files together.
+  Python and the dependencies are bundled; no installation is required.
+- **Windows installer EXE:** run `LeadTheTarget-vVERSION-windows-setup.exe`.
+  It installs for the current user, creates Start menu shortcuts, optionally adds
+  a desktop shortcut and includes an uninstaller. No Python or administrator
+  permissions are required. Uninstalling keeps your profile.
+
+These are unsigned independent builds. Verify the release's SHA256SUMS.txt if
+needed. Do not disable security software to run a download.
+
+## Run the source
 
 ```powershell
 python -m venv .venv
@@ -22,162 +32,107 @@ python -m venv .venv
 .\.venv\Scripts\python.exe main.py
 ```
 
-On macOS/Linux use `python3`, `.venv/bin/python`, and the same requirements/main.py.
-No image downloads, accounts, network services or OpenGL drivers are needed.
+`play.bat` also launches the game. On macOS/Linux use `.venv/bin/python`; those
+source platforms have not been verified. Windows x64 is the packaged target.
 
-## How learning works
+## Playing
 
-The loop is **predict → run → observe measured evidence → congratulations → defend**.
-Each lesson ends with a tower-defense transfer wave. Baseline experiment misses
-do not count against combat accuracy. Reading a page or moving a slider cannot
-award a skill: the required experiment must actually finish and meet its criterion.
+Start with **Continue campaign** or visit the **Academy**. The campaign has 100
+timed encounters across ten regions. Region patterns include rushes, armour,
+staggered attacks, multiple gates, boosts, braking and surprise speed switches.
 
-- Make predictions and answer concrete time/distance/formula questions.
-- Choose a model with the **Aim** dropdown or keys **1–5**.
-- Adjust fixed lead with its slider or **[ / ]**, then run the experiment.
-- Later, change the current P/I/D/F term and compare measured error/overshoot.
-- The current task, hint and feedback remain visible in the coaching rail.
-- **Congratulations** records the measurement and awards ten coins exactly once.
-  Select **Continue** to acknowledge it and move on.
-- After each lesson's experiments, launch its defense wave. Kills earn eight coins;
-  a clear awards thirty-five. Required sensor funding is guaranteed and explained.
-- **Workshop** previews upgrade effects. Calibration equipment is fixed to keep
-  comparisons fair; upgrades apply in field waves and Free play.
-- **Notes** holds your discoveries, results and replayable experiments.
-- **Free play** unlocks all algorithms and grants 999 coins without modifying
-  campaign mastery or banking its currency.
+Select a numbered pad, choose **Build towers**, choose a tower type and click an
+empty pad. Sentinels are available immediately; heavy cannons unlock at level 8,
+colour hardware and sensor stations at 31, tracking turrets and motor control
+at 41. Each tower has independent aim, reload, upgrades and target priority.
+Shell reservations coordinate incoming damage between towers. Later regions
+introduce motor bias and PIDF challenges.
 
-A failed field restores its starting currency. Replay retains your tuning and all
-completed guided tasks. The base is rebuilt to sixteen health between field lessons.
-Each leaked tank costs two health. Success requires the displayed hit count and
-accuracy goal, calculated after all shots resolve. The motor has a two-degree
-alignment interlock: bad tracking delays firing; shells always follow the actual
-barrel and cannot steer after launch.
+- **Direct** aims at the current observed position: watch it miss behind a tank.
+- **Fixed lead** uses `position + velocity * time`. Drag the native slider, type
+  an exact value and press Enter, use the +/- buttons, or press `[` / `]`.
+- **Intercept** solves `|r + v*t| = shell_speed*t` for the earliest positive time.
+  It unlocks at campaign level 5; Adaptive opens at 21 and Colour aware at 31.
+- **Adaptive** estimates acceleration from position samples, using
+  `p + v*t + 0.5*a*t*t` over a bounded forecast horizon.
+- **Colour aware** branches on sensor data: red boosts, gold brakes in zones,
+  blue cruises. A visible colour is not available to code without hardware.
 
-## Eight lessons
+Buy more towers, upgrade, sell at 65% recovery, and copy tuning to towers of the
+same type. The base has 16 health. A cleared encounter banks kill credits and
+a first-clear bonus; replay bonuses are smaller. Quitting an active attack
+restarts it and does not bank pending kill rewards. On defeat, **Relocate troops**
+redeploys one tower at a new pad, salvages extra equipment and guarantees a
+90-credit rebuilding fund. Repeatable calculation contracts earn 20 credits.
+All 12 pads are fixed: roads cannot be blocked. Campaign maps currently reuse
+one island with three entrance routes; the ten regions vary encounter rules.
 
-1. **Predict ahead:** observe direct aim missing, then adjust a fixed lead to hit.
-2. **Time and distance:** calculate flight time and lead, then solve a changed range.
-3. **Intercept:** select the future-position expression, solve the meeting time,
-   choose its earliest positive root and hit a faster target.
-4. **Acceleration:** measure a constant-velocity miss, improve it with acceleration,
-   then handle deceleration and identify post-launch prediction limits.
-5. **Colour sensing:** install the sensor, compare OFF/ON, execute red and gold
-   branches and explain which input selects the branch.
-6. **P:** compare P=1 with your tune, reducing RMS tracking error by at least 20%.
-7. **I, then D:** reduce steady bias error by 40%, then overshoot by 25% in separate
-   controlled comparisons. A slider value alone is insufficient.
-8. **F:** reduce steady moving-reference error by 30%, explain feedforward, then
-   complete the mixed final wave with all prior evidence recorded.
+The academy is separate from campaign position: 8 lessons, 37 measured tasks.
+It asks for a prediction, records an experiment, compares baselines and rewards
+demonstrated success with a congratulations screen. Setting a positive I, D or F
+gain alone cannot pass: measured improvement is required. Once-only mastery
+rewards also fund the campaign. Academy equipment is deliberately held constant
+to isolate one control term; telemetry reports the actual active gains.
 
-Useful calibration starting points: P around 6–8; I around 1–2; D around 0.3–0.6;
-F around 1. The baseline and tuning trials explicitly hold other terms/equipment
-constant. Your field tuning is preserved as lessons advance.
+The game uses a 120 Hz simulation independent of rendering FPS. Prediction in
+campaign combat updates at 20 Hz; sampled sensors update at approximately 8 Hz.
+Rendering uses a lit Panda3D scene graph with solid geometry. Projectile physics
+is on the ground plane: shell height is decorative, and gravity is not modelled.
 
-## Controls and accessibility
+## Controls and display
 
-- **Mouse:** buttons and sliders. Click an enabled gain value for exact numeric entry.
-- **Tab / Shift+Tab:** focus visible controls; **Enter** activates.
-- **Arrow keys:** adjust an editable slider; gain fields also accept typed values.
-- **1–5:** select an unlocked algorithm. **[ / ]:** fixed lead in 0.05s steps.
-- **Space / Escape:** pause/resume an experiment or wave when a button is not focused.
-- **Period:** advance one 1/120s simulation tick while paused.
-- **H:** explanation; **V:** overlays; **F11:** fullscreen/windowed.
-- **Mouse wheel / PageUp / PageDown:** scroll long coaching text or notebook entries.
-- **Free play camera:** wheel over the battlefield zooms; right-drag orbits.
-  **Camera** resets it. Guided cameras remain fixed for clear comparisons.
-- **Options:** sound/mute, volume, reduced motion, larger text and high contrast.
-- Losing focus/minimizing automatically pauses active simulation.
+- Mouse: select towers/pads; drag sliders; click numeric values and press Enter.
+- Space: pause/resume; C or **Compact mode**: bottom control dock.
+- Tab / Enter: focus/activate buttons. Escape: back; it cannot skip mastery.
+- Mouse wheel over the field: zoom. Left/right arrows: campaign camera orbit.
+- Options: monitor detection, resolution, windowed/borderless/fullscreen,
+  30/60/90/120/144/165/240 FPS or uncapped, VSync, larger text, high contrast,
+  reduced motion and sound. Confirm display changes within 15 seconds or revert.
+  Borderless uses the desktop resolution. VSync/graphics drivers can cap FPS
+  below the selected limit. No guaranteed frame rate is implied.
 
-The interface uses symbols and labels as well as colour. It has a compact layout
-for 800×600 windows and larger-text scrolling. A screen reader cannot infer drawn
-pygame text; [ACCESSIBLE_GUIDE.md](ACCESSIBLE_GUIDE.md) provides the complete task
-and explanation text as a normal document. Notifications occupy a reserved band
-and do not cover buttons. New campaign asks before replacing a save.
+Packaged builds target x64 Windows 10 1809+ / Windows 11, with a graphics driver
+supporting Panda3D's OpenGL renderer. Minimum window: 800x600; 1280x800 or greater
+is recommended for readability. Minimum RAM/GPU specs have not been benchmarked.
 
-## Saves and migration
+## Saves and troubleshooting
 
-Source runs save `save.json` beside the sources. The packaged Windows build uses
-`%APPDATA%/LeadTheTarget/progress.json`. Saves include step evidence, acknowledgments,
-once-only rewards, tuning, lead, algorithm, campaign economy and display options.
-Writes are atomic, the previous good file becomes `.bak`, and an unreadable file
-is preserved as `.unreadable` when starting again. A backup is recovered with an
-explicit notice. Errors leave progress in the current session rather than crashing.
+Source runs use `profile3.json` beside the code. Packaged runs use
+`%APPDATA%/LeadTheTarget/profile3.json`. Writes are atomic and keep a backup.
+The old `save.json` is imported conservatively and preserved. Academy progress,
+credits and preferences migrate; a lesson number is never interpreted as a
+campaign level. A display choice that fails can be left alone to roll back.
 
-Old version-1 saves keep credits/upgrades but begin the guided sequence at lesson
-one, since an old wave clear is not evidence that a skill was demonstrated. The
-original file is backed up at the first write. To move a source save into the
-packaged build, close the game and copy `save.json` to the packaged save location,
-renaming it `progress.json`.
+Fully extract the portable archive before launching. Do not move only the EXE.
+Update your graphics driver if a graphics window cannot open. Headless verification
+uses Panda3D's software renderer and does not verify a particular GPU driver.
+Report issues at https://github.com/Leaferd6712/Lead-the-Target/issues.
 
-## Physics and rendering
+## Editing and checking
 
-The battlefield contains actual solid 3D meshes: extruded boxes, cylinders,
-flat-shaded terrain/road, towers and tanks. `camera.py` projects their vertices
-orthographically; `renderer3d.py` sorts visible faces and rasterizes them in pygame.
-Static terrain and UI art are cached. No GPU context is needed for headless tests.
-
-Gameplay uses a flat ground plane measured in pixels and seconds. Decorative mesh
-height does not add gravity or alter the interception problem. This keeps simple
-physics clear before any future vertical-ballistics extension. The mathematical
-launch origin is the tower pivot and every predictor uses that same origin.
-
-For constant velocity, solve `|r + v*t| = s*t`:
-
-```text
-r = target_position - tower_position
-(v.v - s*s)t*t + 2(r.v)t + r.r = 0
-lead_point = target_position + v*t
-```
-
-Select the earliest positive root; handle the equal-speed linear case separately.
-Adaptive uses `p + v*t + 0.5*a*t*t` briefly, then continues at its forecast velocity.
-Its bounded numerical solver reports when no intercept is found within four seconds.
-Sampled sensors estimate motion from positions; colour stays `None` when absent or
-disabled. Colour rules are shared published profiles, not access to future state.
-
-```text
-P = Kp * wrapped angular error
-I = Ki * accumulated error
-D = -Kd * filtered measured turn rate
-F = Kf * desired turn rate
-request = P + I + D + F
-```
-
-The motor has lag, speed limits, anti-windup and an explicitly applied bias.
-Feedforward suppresses reference jumps on target reacquisition. Desired/actual
-direction and live error are graphed beside the scene; term contributions, clipped
-request and actual motor output remain visible. Collision uses earliest swept
-contact, with shot provenance and pending/resolved outcomes recorded separately.
-
-## Source layout
-
-- `curriculum.py`: task definitions, evidence gates, mastery and acknowledgments.
-- `experiments.py`: controlled ballistic and motor calibration simulations.
-- `game.py`: campaign, wave scheduling, economy and typed scene transitions.
-- `domain.py`: scene router, learner events, trial metrics and shot records.
-- `targeting.py`: editable strategy classes and intercept solvers; no drawing.
-- `sensors.py`, `behaviours.py`: sampled observations and published motion profiles.
-- `control.py`, `simulation.py`: PIDF, motor response, tanks, shells, collision.
-- `camera.py`, `geometry.py`, `renderer3d.py`: geometric 3D presentation.
-- `theme.py`, `ui.py`, `audio.py`: UI art, responsive input and generated audio cues.
-- `persistence.py`: validation, migration, backup and atomic writes.
-- `tests/`: numerical, full-journey, navigation, save, projection and UI checks.
-
-## Verify and build
+`targeting.py`, `control.py`, `sensors.py`, `simulation.py` are engine independent.
+`campaign.py`, `waves.py`, `fortress.py` own campaign rules. `curriculum.py`,
+`experiments.py` and `game.py` own academy evidence. `app.py` coordinates scenes,
+`scene3d.py` renders, `ui.py` builds DirectGUI, `display.py` applies preferences,
+and `profile_store.py` handles the new profile.
 
 ```powershell
-.\.venv\Scripts\python.exe -m unittest discover -s tests -v
-.\.venv\Scripts\python.exe main.py --headless --stage 1 --frames 120 --benchmark --screenshot artifacts/quest.png
-.\.venv\Scripts\python.exe -m pip install -r requirements-build.txt
-.\build.ps1
+.\.venv\Scripts\python.exe -m unittest discover -s tests -q
+.\.venv\Scripts\python.exe main.py --headless --level 1 --autoplay --frames 160 --screenshot artifacts/smoke.png
+.\.venv\Scripts\python.exe tools/check_website.py
 ```
 
-`--stage 1` through `--stage 8` preview a guided lesson without altering saves.
-`--autoplay` runs a Free play wave; it cannot award mastery. `--frames N` exits after
-N frames. `--headless` uses deterministic SDL dummy video/audio. `--benchmark`
-reports measured frame-processing mean/p95, excluding frame-rate throttling.
-The tests include a complete 37-checkpoint learner journey and negative checks
-that P-only tuning, final settings or scene changes cannot fabricate mastery.
-Automated checks establish reproducible behaviour, not human learning outcomes;
-classroom/first-time-player validation remains valuable.
+CLI previews (`--headless`, `--frames`, `--level`, `--stage`) never modify saves.
+`--resolution 1920x1080` and `--compact` are useful for layout checks.
+
+## Automated releases and website
+
+See the [deployment guide](https://github.com/Leaferd6712/Lead-the-Target/blob/main/DEPLOYMENT.md). Stable `vMAJOR.MINOR.PATCH` tags run Windows
+tests and build all three distributions. A release remains a draft until every
+required build and execution check has passed. Website-only changes deploy Pages
+without rebuilding the game. Download buttons enable only for a complete stable
+release; draft/development builds are excluded. Online leaderboards are not
+implemented; current records are local.
+
+MIT game licence. Panda3D, Python, PyInstaller and font notices are described in
+THIRD_PARTY_NOTICES.md and bundled with the distributions.

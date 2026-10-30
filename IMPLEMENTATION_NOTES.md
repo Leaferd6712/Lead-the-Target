@@ -1,68 +1,34 @@
-# Control Quest 3D — implementation and verification
+# Panda3D implementation notes
 
-## What changed from the review
+The current implementation supersedes the earlier pygame renderer and UI. Git
+history preserves those files. Runtime dependencies, launcher, screenshots,
+tests, assets and release scripts now use Panda3D.
 
-- **V1–V8:** procedural purple/bevelled arcade UI, bright gold/turquoise/green
-  action states, bolder hierarchy, geometric icons, pressed/focus/locked states,
-  medals, confetti, generated sound, upgrade cards and visible sensor hardware.
-  The supplied PNGs informed the style; no asset-sheet pixels were extracted.
-- **L1–L8:** 37 evidence-gated checkpoints, action events, actual simulations,
-  controlled baselines, transfer questions and a defense wave in every lesson.
-  I/D are separate comparisons; F needs measured improvement. Persistent hints,
-  congratulations/explicit acknowledgment, notebook/replay, versioned evidence,
-  once-only rewards and saved tuning replace text-page progression.
-- **D1–D4:** actual solid meshes projected by an orthographic camera, flat lighting,
-  geometric tanks/tower/road/terrain, ground markers and ghost hulls. Software mesh
-  rasterization in pygame replaces the proposed OpenGL route, keeping the package
-  and headless tests free of graphics-driver/context requirements. Ground-plane
-  physics remains intentionally planar. Free play supports orbit/zoom/reset.
-- **B1–B9:** centralized scene stack; fresh result state; guarded advancement;
-  retained gains; true 530-unit range; stationary-target confidence; consistent
-  idle motor/bias; earliest swept contact; shot provenance/resolution;
-  transactional completion/rewards; search-horizon status; feasible-target
-  selection and feedforward reacquisition handling.
-- **U1–U8:** live error plus desired/actual traces; signed term contributions;
-  numeric entry and keyboard focus; compact/larger-text/high-contrast modes;
-  non-overlapping notifications; fixed calibration equipment; explicit wait
-  reasons; lesson map, notebook and saved-experiment replay; new-campaign
-  confirmation and automatic focus-loss pause. The accessible task companion is
-  a normal Markdown document, rather than a claim of native screen-reader support.
-- **C1–C7:** typed scene/domain records, shared behaviour rules, strategy protocol,
-  lesson-owned goals, cached UI/static meshes/forecast tables, regression and
-  full-journey tests, headless screenshots, benchmark mode, versioned backup/recovery,
-  dependency notices, build script and packaged Windows release.
+- Ground physics and teaching formulas are retained. Projectiles are non-homing;
+  a prediction cannot alter a shell already in flight.
+- A campaign level and an academy lesson are separate state. 100 encounters
+  reuse one island and three routes. Timing, formations, behaviour and armour
+  vary; this release does not claim 100 hand-made terrain maps.
+- Each tower owns a motor/controller and configuration. Construction uses 12
+  fixed pads. All towers and projectile collisions share the 120 Hz clock.
+  Predictions update at 20 Hz to bound the cost of numerical intercept solving.
+- Colour data is removed from observations unless a tower has enabled hardware
+  or receives an enabled sensor station's coverage. The player seeing a tank's
+  colour never grants hidden state to the algorithm.
+- Native DirectSlider widgets persist across frames; lead numeric entry,
+  plus/minus and keyboard alternatives call the same state update. The first
+  fixed-lead academy task selects its required model automatically.
+- Calibration telemetry reads the actual Experiment.gains. It cannot report
+  unused chosen gains while the experiment isolates a different term.
+- UI coordinates scale from 1440x900. Compact mode is a bottom dock. The camera
+  renders into the free battlefield region, with inverse viewport transforms
+  for picking. Display preferences have a wall-clock rollback timer.
+- Profile schema 3 reads the old save without rewriting it. Kill rewards remain
+  unbanked until victory. Academy-to-campaign rewards use persisted transfer
+  markers and cannot be claimed twice.
+- Website and release workflows are separate. Actual built screenshots are
+  checked into website/images; release assets are selected from GitHub metadata.
 
-## Verification performed
-
-- 46 automated tests, including the complete 37-checkpoint campaign and negative
-  mastery checks, pass on Windows/Python 3.12 with pygame 2.6.1.
-- Controlled acceleration experiment: constant-velocity shot misses; adaptive shot
-  hits and improves measured separation. Direct targeting fails the crossing case;
-  solved interception succeeds.
-- P-only settings cannot complete the guided I/D/F experiments. Each comparison
-  needs a real completed trial, the relevant positive term and a measured improvement.
-- Saved progress resumes an unacknowledged congratulations screen without paying
-  the reward again. Legacy migration retains economy without inventing skill evidence.
-- UI tests cover pointer controls, keyboard focus, exact gain entry, focus-loss
-  pause, queued double clicks, modal navigation and compact large-text layout.
-- Fourteen deterministic screens are generated by `tools/qa_screens.py`; these
-  include actual trial, success, wrong-answer, field, shop and accessibility states.
-- A 900-frame headless field benchmark measured **7.43 ms mean / 8.62 ms p95**
-  processing time on this host, excluding frame throttling. This is a host-specific
-  processing measurement, not a guarantee for other machines.
-- The Windows bundle builds with PyInstaller and launches in headless mode without
-  using the project Python environment. A native-window automation attempt reached
-  an app-approval timeout, so native desktop interaction is not claimed as verified.
-
-## Delivery
-
-- `play.bat` / `python main.py`: source entry points.
-- `dist/LeadTheTarget/LeadTheTarget.exe`: packaged Windows game; keep its folder intact.
-- `README.md`: controls, setup, model, saves and source map.
-- `ACCESSIBLE_GUIDE.md`: all task and explanation text.
-- `artifacts/v1-source.zip`: original source snapshot before this implementation.
-
-Human classroom/first-time-player evaluation was not available in this session.
-The tests demonstrate reproducible behaviour and evidence gates, not measured
-human retention or learning outcomes. The software 3D renderer is designed for
-this simple, non-intersecting scene rather than arbitrary complex 3D environments.
+The academy core and its 37 existing evidence gates are retained. New tests cover
+campaign completion, sensor gates, construction, banking, relocation, FPS
+independence, native slider callbacks, display rollback and actual telemetry.
