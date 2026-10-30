@@ -1,5 +1,5 @@
 #ifndef GameVersion
-  #define GameVersion "2.0.0"
+  #define GameVersion "2.0.1"
 #endif
 #ifndef SourceDir
   #define SourceDir "..\dist\LeadTheTarget"
@@ -27,7 +27,7 @@ OutputBaseFilename=LeadTheTarget-v{#GameVersion}-windows-setup
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
-DisableProgramGroupPage=yes
+DisableProgramGroupPage=no
 CloseApplications=yes
 SetupIconFile=..\assets\app.ico
 LicenseFile=..\LICENSE

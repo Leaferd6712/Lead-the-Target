@@ -17,8 +17,15 @@ Local verification on 30 October 2026, Windows 11 x64 / Python 3.12:
   horizontal overflow, loaded imagery, JavaScript errors and incomplete-release
   disabled states. Screenshots were visually inspected.
 
-GitHub Actions, public downloads and deployed Pages are verified after the
-publication run; the corresponding results are appended here once available.
+The earned-budget campaign test passed all 100 levels without granting currency
+or bypassing equipment/model unlocks. GitHub regression runs and the initial
+Pages deployment passed. The public site passed the same three responsive checks.
+
+The first release job correctly blocked publication: its new shortcut test found
+that Inno Setup ignores /GROUP when DisableProgramGroupPage is enabled. The
+installer now exposes the Start menu folder page, permitting an isolated QA group.
+The failed v2.0.0 tag is preserved; the corrected release uses v2.0.1.
+Public release/download results are appended after the corrected run.
 
 Limits: no fresh-player study, physical mouse/DPI test across all displays, clean
 Windows VM without developer tools, exhaustive GPU/monitor-mode matrix, macOS or
