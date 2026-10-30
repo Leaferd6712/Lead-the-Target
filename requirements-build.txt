@@ -1,2 +1,2 @@
-# Build tools only; players do not install these.
+-r requirements.txt
 pyinstaller==6.16.0

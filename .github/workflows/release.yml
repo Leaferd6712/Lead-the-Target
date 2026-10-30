@@ -1,0 +1,81 @@
+name: Build and release game
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing version tag to build (for example v2.0.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event.inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    permissions:
+      contents: write
+    env:
+      VERSION_TAG: ${{ github.event.inputs.tag || github.ref_name }}
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref_name }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-build.txt
+      - name: Validate release tag matches source version
+        shell: pwsh
+        run: |
+          if ($env:VERSION_TAG -notmatch '^v[0-9]+\.[0-9]+\.[0-9]+$') { throw 'A stable vMAJOR.MINOR.PATCH tag is required.' }
+          if ((Get-Content VERSION).Trim() -ne $env:VERSION_TAG.Substring(1)) { throw 'Tag and VERSION disagree.' }
+          git rev-parse --verify "refs/tags/$env:VERSION_TAG"
+          if ($LASTEXITCODE -ne 0) { throw 'Release tag does not exist.' }
+      - name: Install build dependencies
+        run: python -m pip install -r requirements-build.txt
+      - name: Install signed Inno Setup compiler
+        shell: pwsh
+        run: ./tools/bootstrap_inno.ps1
+      - name: Test, build, install, launch and uninstall
+        shell: pwsh
+        run: python tools/package.py --version $env:VERSION_TAG --iscc $env:ISCC_PATH
+      - name: Preserve verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-verification
+          path: |
+            artifacts/release-qa/*.png
+            artifacts/release-qa/*.log
+          if-no-files-found: warn
+      - name: Preserve distribution artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: distributions-${{ env.VERSION_TAG }}
+          path: release/*
+          if-no-files-found: error
+      - name: Publish complete stable release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $assets = @(Get-ChildItem -LiteralPath release -File | Select-Object -ExpandProperty FullName)
+          if ($assets.Count -ne 4) { throw 'Expected source, portable, setup and checksums.' }
+          gh release create $env:VERSION_TAG @assets --verify-tag --draft --title "Lead the Target $env:VERSION_TAG" --notes-file RELEASE_NOTES.md
+          if ($LASTEXITCODE -ne 0) { throw 'Could not create draft release; no stable release was published.' }
+          gh release edit $env:VERSION_TAG --draft=false --latest
+          if ($LASTEXITCODE -ne 0) { throw 'Could not publish the verified release.' }
