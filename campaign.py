@@ -26,6 +26,7 @@ class Campaign:
         self.completed = dict(saved.get("completed",{}))
         self.towers = restore_towers(saved.get("towers",[]))
         if not self.towers: self.towers = [Emplacement(1,0)]
+        for tower in self.towers: tower.algorithm = min(tower.algorithm,self.unlock)
         self.selected_id = self.towers[0].id
         self.message = "Select a build pad to expand your fortress."
         self.routes = [Route(i) for i in range(3)]
@@ -41,8 +42,14 @@ class Campaign:
     def spec(self): return LEVELS[self.level-1]
 
     @property
+    def technology_level(self):
+        # Replaying a cleared sector never removes already-earned technology.
+        return min(100,max([self.level]+[int(k)+1 for k in self.completed]))
+
+    @property
     def unlock(self):
-        return 4 if self.level >= 31 else 3 if self.level >= 21 else 2 if self.level >= 5 else 1
+        level=self.technology_level
+        return 4 if level >= 31 else 3 if level >= 21 else 2 if level >= 5 else 1
 
     def snapshot(self):
         return {"level":self.level,"credits":self.credits,"site":self.site,
@@ -66,7 +73,7 @@ class Campaign:
     def build(self, kind, pad):
         if kind not in SPECS or not 0 <= pad < len(PADS): return False
         spec = SPECS[kind]
-        if self.level < spec.unlock:
+        if self.technology_level < spec.unlock:
             self.message = f"{spec.title} unlocks at level {spec.unlock}."; return False
         if any(t.pad == pad for t in self.towers):
             self.message = "That pad is occupied. Select its tower to configure it."; return False
@@ -91,7 +98,7 @@ class Campaign:
     def buy_colour(self):
         t = self.selected
         if not t or t.colour: return False
-        if self.level < 31:
+        if self.technology_level < 31:
             self.message = "Campaign colour research opens at level 31. Try it in the academy now."; return False
         if self.credits < 80:
             self.message = "Colour sensor costs 80 credits."; return False

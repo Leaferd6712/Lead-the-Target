@@ -1,5 +1,5 @@
 #ifndef GameVersion
-  #define GameVersion "2.0.2"
+  #define GameVersion "2.0.3"
 #endif
 #ifndef SourceDir
   #define SourceDir "..\dist\LeadTheTarget"

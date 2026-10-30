@@ -64,6 +64,7 @@ class Interface:
         return b
 
     def menu(self,items,current,x,y,w,callback):
+        current=max(0,min(len(items)-1,current))
         m=DirectOptionMenu(parent=self.root,pos=(x,0,-y),items=list(items),initialitem=current,
             scale=17,text_scale=1,text_fg=WHITE,text_font=self.app.font,frameColor=RAISED,highlightColor=PURPLE,relief=DGG.RAISED,
             command=callback,popupMarker_pos=(w/17-1,0,0),frameSize=(0,w/17,-1.65,.4),item_frameColor=PANEL,item_text_fg=WHITE)
@@ -183,7 +184,7 @@ class Interface:
                 self.panel(35,265,520,260);self.text('BUILD / SELECT A PAD ON THE ISLAND',55,281,20,GOLD)
                 for i,(kind,spec) in enumerate(SPECS.items()):
                     self.button(f'{spec.title}  /  {spec.cost}c',55+(i%2)*244,330+(i//2)*65,230,
-                        lambda k=kind:a.choose_build(k),AQUA if a.build_kind==kind else PURPLE,enabled=c.level>=spec.unlock)
+                        lambda k=kind:a.choose_build(k),AQUA if a.build_kind==kind else PURPLE,enabled=c.technology_level>=spec.unlock)
                 self.text(f'Choose a tower, then click an empty numbered pad.\nSelected pad: {a.build_pad+1 if a.build_pad is not None else "none"}',55,467,16,MUTED,470)
         else:
             g=a.academy;self.panel(28,108,900,66);self.text(g.lesson.title,46,122,27,GOLD)

@@ -50,13 +50,23 @@ class InterfaceTests(unittest.TestCase):
         from direct.gui.DirectOptionMenu import DirectOptionMenu
         a=self.app;a.open_options();a.ui.refresh()
         menus=[w for w in a.ui.widgets if isinstance(w,DirectOptionMenu)]
-        menus[0].set(menus[0]['items'].index('1600 x 900'))
+        current=f'{a.prefs["resolution"][0]} x {a.prefs["resolution"][1]}'
+        choice=next(value for value in menus[0]['items'] if value!=current)
+        expected=[int(v) for v in choice.split(' x ')]
+        menus[0].set(menus[0]['items'].index(choice))
         menus[2].set(menus[2]['items'].index('144'))
         muted=a.prefs['muted'];a.toggle_pref('muted');a.toggle_display_vsync();a.ui.refresh()
         next(action for button,action,title in a.ui.buttons if title=='APPLY DISPLAY')()
-        self.assertEqual(a.prefs['resolution'],[1600,900]);self.assertEqual(a.prefs['fps'],144)
+        self.assertEqual(a.prefs['resolution'],expected);self.assertEqual(a.prefs['fps'],144)
         self.assertEqual(a.prefs['muted'],not muted)
         a.revert_display();a.close_options()
+
+    def test_replay_with_advanced_equipment_keeps_valid_menu(self):
+        a=self.app
+        from campaign import Campaign
+        a.campaign=Campaign();a.campaign.completed={'50':16};a.campaign.level=1
+        a.campaign.selected.algorithm=4;a.enter_campaign();a.ui.refresh()
+        self.assertEqual(a.campaign.unlock,4)
 
     def test_compact_is_bottom_and_can_expand(self):
         a=self.app;a.enter_campaign();a.toggle_compact();a.ui.refresh()

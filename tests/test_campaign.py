@@ -60,6 +60,11 @@ class CampaignTests(unittest.TestCase):
         c.selected.lead=1.2;self.assertEqual(c.towers[0].lead,.8)
         c.copy_configuration();self.assertEqual(c.towers[0].lead,1.2)
 
+    def test_replay_preserves_technology_and_unlocked_towers(self):
+        c=Campaign();c.completed={'50':16};c.level=1;c.credits=400
+        self.assertEqual(c.unlock,4);self.assertTrue(c.build('tracking',1))
+        self.assertTrue(c.buy_colour())
+
     def test_rewards_idempotent_and_loss_does_not_bank_kills(self):
         c=run(Campaign());bank=c.credits;c.finish();self.assertEqual(c.credits,bank)
         c=Campaign();c.start();c.pending_credits=40;c.health=0;c.finish()

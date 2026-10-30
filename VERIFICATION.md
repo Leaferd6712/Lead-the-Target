@@ -38,6 +38,14 @@ passes. The public-download verification helper checks released bytes and runs
 the source in a fresh virtual environment, the portable EXE with a minimal PATH,
 and the installed application with shortcut/uninstall checks.
 
+The v2.0.2 workflow caught a test assumption: its display test requested a
+resolution larger than the CI runner's detected monitor. The test now chooses
+from detected resolutions and was repeated with a 1024x768 monitor simulation.
+No v2.0.2 release was published. A further replay check reproduced an advanced
+algorithm menu crash when returning to level 1. The v2.0.3 correction retains
+earned technology across replays and bounds restored menu selections. Focused
+replay, construction and display regressions passed before tagging.
+
 Limits: no fresh-player study, physical mouse/DPI test across all displays, clean
 Windows VM without developer tools, exhaustive GPU/monitor-mode matrix, macOS or
 Linux package verification, or online leaderboard service. Source and portable

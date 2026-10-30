@@ -1,4 +1,4 @@
-Version 2.0.2 keeps pending resolution and FPS selections when accessibility or VSync options change. A regression test exercises the actual menu and Apply-button callbacks. Installer shortcuts, launch and uninstall are verified before publication.
+Version 2.0.3 keeps earned technology available when replaying earlier levels, preventing an advanced-targeting menu crash. It also preserves pending resolution and FPS selections when accessibility or VSync options change. Regression tests exercise actual menu and Apply-button callbacks, including small monitor configurations. Installer shortcuts, launch and uninstall are verified before publication.
 
 The Panda3D edition of Lead the Target brings a real 3D battlefield, a 100-encounter campaign, purchasable towers, fortress rebuilding and an evidence-based targeting and PIDF academy.
 
