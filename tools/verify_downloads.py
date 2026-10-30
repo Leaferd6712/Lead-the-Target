@@ -3,6 +3,7 @@
 Windows maintainer check. Installs only into this project's artifacts/download-qa.
 """
 import hashlib
+import argparse
 import json
 import os
 from pathlib import Path
@@ -35,12 +36,15 @@ def execute(command,**kwargs):
 
 
 def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--tag',help='Require this published stable tag')
+    args=parser.parse_args()
     assert QA.is_relative_to(ROOT.resolve())
     QA.mkdir(parents=True,exist_ok=True)
     req=urllib.request.Request('https://api.github.com/repos/Leaferd6712/Lead-the-Target/releases/latest',headers={'User-Agent':'LeadTheTarget-release-QA'})
     with urllib.request.urlopen(req,timeout=30) as response:release=json.load(response)
     assert not release['draft'] and not release['prerelease']
     tag=release['tag_name'];assets={a['name']:a for a in release['assets']}
+    if args.tag:assert tag==args.tag,f'Expected {args.tag}; server returned {tag}'
     names={k:f'LeadTheTarget-{tag}{suffix}' for k,suffix in
            (('source','-source.zip'),('portable','-windows-portable.zip'),('setup','-windows-setup.exe'))}
     for name in list(names.values())+['SHA256SUMS.txt']:

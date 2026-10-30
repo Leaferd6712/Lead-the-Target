@@ -68,3 +68,10 @@ dragging on every Windows DPI setting, every GPU/monitor mode, or a clean Window
 computer with no developer tools installed. Bundled execution tests remove Python
 from PATH, but are run on build/development hosts. Code signing and online
 leaderboards are not included. See VERIFICATION.md for execution evidence.
+
+To recheck public release bytes, run `python tools/verify_downloads.py --tag v2.0.3`
+on Windows. It downloads the release, validates checksums, creates a clean source
+environment and tests the downloaded portable and installer distributions. To
+check the live responsive site, install the optional developer tool
+`playwright==1.56.0`, run `python -m playwright install chromium`, then run
+`python tools/browser_qa.py https://leaferd6712.github.io/Lead-the-Target/ --live --tag v2.0.3`.

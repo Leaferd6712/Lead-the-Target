@@ -51,3 +51,41 @@ Windows VM without developer tools, exhaustive GPU/monitor-mode matrix, macOS or
 Linux package verification, or online leaderboard service. Source and portable
 execution checks on a development host do not prove every clean-machine setup.
 The build is unsigned. No minimum hardware performance specification is claimed.
+
+## Final published result: v2.0.3
+
+- Repository: https://github.com/Leaferd6712/Lead-the-Target
+- Website: https://leaferd6712.github.io/Lead-the-Target/
+- Release: https://github.com/Leaferd6712/Lead-the-Target/releases/tag/v2.0.3
+- Final regression workflow passed:
+  https://github.com/Leaferd6712/Lead-the-Target/actions/runs/40982232064
+- Release workflow passed **59 tests**, built all three distributions and
+  execution-tested source, portable EXE, installation, shortcuts and uninstall:
+  https://github.com/Leaferd6712/Lead-the-Target/actions/runs/40982236288
+- The post-release Pages deployment passed:
+  https://github.com/Leaferd6712/Lead-the-Target/actions/runs/40982617164
+- All three public release assets and SHA256SUMS.txt were downloaded from the
+  actual GitHub release. Every file matched its checksum. The downloaded source
+  ran in a newly created virtual environment containing only its runtime
+  dependency. The downloaded portable EXE ran with Python removed from PATH,
+  using both offscreen software rendering and a real Windows OpenGL window.
+- The downloaded installer installed to an isolated test directory, created its
+  Start menu shortcut, launched, and uninstalled the game and shortcut. The log
+  reports user privileges None, administrative install mode No, HKCU registration.
+- Live Chromium checks passed at 1440x1000, 768x1024 and 390x844. All three
+  download links were checked against **v2.0.3**, not just filename suffixes.
+  The deployed release.json fallback was independently checked as v2.0.3.
+- Local execution evidence is under artifacts/download-qa and artifacts/website;
+  these generated files and clean test environments are excluded from Git.
+
+Reproduce the final public checks from a development checkout:
+
+```powershell
+python tools/verify_downloads.py --tag v2.0.3
+python tools/browser_qa.py https://leaferd6712.github.io/Lead-the-Target/ --live --tag v2.0.3
+```
+
+The browser check uses the optional development tool Playwright 1.56.0 plus its
+Chromium runtime. Neither is a game runtime dependency. The limitations listed
+above still apply; a clean Windows VM and the full hardware/DPI matrix were not
+available, and no manual mouse walkthrough or learner study is claimed.

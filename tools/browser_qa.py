@@ -9,7 +9,8 @@ from playwright.sync_api import sync_playwright
 
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('url');p.add_argument('--live',action='store_true');args=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('url');p.add_argument('--live',action='store_true')
+    p.add_argument('--tag',help='Require this stable release in every download link');args=p.parse_args()
     out=Path(__file__).resolve().parents[1]/'artifacts'/'website';out.mkdir(parents=True,exist_ok=True)
     with sync_playwright() as runtime:
         browser=runtime.chromium.launch(headless=True)
@@ -29,6 +30,8 @@ def main():
                     button=page.locator(f'[data-format="{format}"]')
                     assert button.get_attribute('href').endswith(suffix)
                     assert button.get_attribute('aria-disabled') is None
+                    if args.tag:assert f'/download/{args.tag}/' in button.get_attribute('href')
+                if args.tag:assert args.tag in page.locator('#release-status').inner_text()
             page.screenshot(path=str(out/f'{width}.png'),full_page=True)
             print(f'{width}x{height}: layout, imagery, scripts'+(', live downloads' if args.live else '')+' passed')
         assert not errors,errors
